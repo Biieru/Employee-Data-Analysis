@@ -1,142 +1,161 @@
-# 📊 Análise de Dados de Funcionários - Big Data
+# BCB Merchant Analytics
 
-## 📋 Descrição do Projeto
+**Pipeline ETL e análise de estabelecimentos credenciados a cartões no Brasil.**
 
-Este projeto apresenta uma análise completa de dados de funcionários utilizando técnicas de Data Science e visualização de dados. A análise foi desenvolvida em Python com foco em estatística descritiva, correlações e insights sobre a força de trabalho da empresa.
+Projeto de engenharia e análise de dados desenvolvido em Python, utilizando dados públicos do Banco Central do Brasil (BCB). A aplicação extrai informações sobre estabelecimentos credenciados e ativos, organiza os dados com pandas e permite sua exportação para CSV e bancos de dados relacionais.
 
-## 🎯 Objetivos da Análise
+O repositório também inclui um notebook de análise e um relatório desenvolvido em Power BI.
 
-O projeto busca responder a 6 perguntas principais sobre os dados dos funcionários:
+## Objetivo
 
-1. **Distribuição da Idade** - Análise da distribuição etária da força de trabalho
-2. **Salário por Estado Civil** - Comparação salarial entre funcionários solteiros e casados
-3. **Correlação Idade x Salário** - Relação entre idade e remuneração
-4. **Salário por Nível de Instrução** - Impacto da educação na remuneração
-5. **Frequência de Estado Civil** - Perfil demográfico dos funcionários
-6. **Distribuição de Filhos por Estado Civil** - Análise da composição familiar
+Explorar dados do mercado brasileiro de pagamentos eletrônicos, aplicando conceitos de extração, transformação, armazenamento e visualização de dados.
 
-## 🛠️ Tecnologias Utilizadas
+Os dados disponibilizados pelo BCB permitem investigar a quantidade de estabelecimentos credenciados e ativos, considerando diferentes bandeiras, funções dos cartões e períodos trimestrais.
 
-- **Python 3.x**
-- **Pandas** - Manipulação e análise de dados
-- **Matplotlib** - Criação de gráficos
-- **Seaborn** - Visualizações estatísticas avançadas
-- **Jupyter Notebook** - Ambiente de desenvolvimento
+## Tecnologias
 
-## 📁 Estrutura do Projeto
+| Tecnologia | Aplicação |
+|---|---|
+| Python | Desenvolvimento do pipeline |
+| pandas | Processamento e organização dos dados |
+| requests | Consumo da API REST |
+| SQLite | Armazenamento relacional |
+| SQLAlchemy e PyMySQL | Integração opcional com MySQL |
+| Jupyter Notebook | Exploração e análise de dados |
+| Power BI | Relatórios e visualização |
 
-DB Funcionarios/
+## Funcionamento
 
-├── 📄 Codes.ipynb # Notebook principal com toda a análise feita
+O projeto segue um fluxo ETL (*Extract, Transform, Load*) dividido em três etapas.
 
-├── 📄 Base de Dados Funcionários.csv # Dataset fonte com cerca de 36 funcionários
+**1. Extração**
 
-├── 📋 requeriments.txt # Dependências do projeto para poder rodar os códigos (libs)
+Consulta à API pública do Banco Central do Brasil, utilizando o serviço `EstabCredTransDA` e um trimestre de referência.
 
-└── 📁 venv_funcionarios/ # Ambiente virtual Python (crie o seu venv)
+**2. Transformação**
 
+Conversão da resposta JSON em um DataFrame pandas, organizando os registros para armazenamento e análise.
 
-## Como Executar
+**3. Carregamento**
 
-### Pré-requisitos
-- Python 3.7+
-- pip ou conda
+Persistência dos dados processados em diferentes formatos:
 
-### Instalação
-```bash
-# Clone o repositório
-git clone https://github.com/Biieru/Analise_Descritiva
+- CSV, para interoperabilidade e análises externas.
+- SQLite, para consultas em banco de dados relacional.
+- MySQL, como alternativa implementada no módulo de persistência, mas não habilitada na execução principal.
 
-# Navegue para a pasta
-cd DB-Funcionarios
+## Estrutura do projeto
 
-# Instale as dependências
-pip install -r requeriments.txt
-
-# Ative o ambiente virtual (recomendado)
-venv_funcionarios\Scripts\activate  # Windows
-source venv_funcionarios/bin/activate  # Linux/Mac
+```text
+EstabelecimentosCredenciados/
+├── main.py
+├── relatorio_estabelecimentos.ipynb
+├── Relatorio Estabelecimentos Credenciados.pbix
+├── requirements.txt
+├── README.md
+└── src/
+    ├── extractTransform.py
+    ├── load.py
+    └── datasets/
 ```
 
-### Execução
-```bash
-# Abra o Jupyter Notebook
-jupyter notebook Codes.ipynb
+O módulo `extractTransform.py` concentra a consulta à API e a transformação da resposta em DataFrame.
 
-# Ou execute no VS Code com extensão Python
+O módulo `load.py` disponibiliza funções independentes para exportação em CSV, SQLite e MySQL.
+
+## Dados analisados
+
+| Campo | Descrição |
+|---|---|
+| `trimestre` | Período de referência |
+| `bandeira` | Bandeira do cartão |
+| `funcaoCartao` | Modalidade do cartão |
+| `qtdEstabCredenciados` | Quantidade de estabelecimentos credenciados |
+| `qtdEstabAtivos` | Quantidade de estabelecimentos ativos |
+
+**Fonte:** [Banco Central do Brasil, Dados Abertos](https://dadosabertos.bcb.gov.br/dataset/estatisticas-meios-pagamentos/resource/523552bd-477b-4dcf-93aa-48ffc3c7a41b)
+
+## Como executar
+
+### 1. Clonar o repositório
+
+```bash
+git clone https://github.com/Biieru/EstabelecimentosCredenciados.git
+cd EstabelecimentosCredenciados
 ```
 
-## Dataset
+### 2. Instalar as dependências
 
-O arquivo `Base de Dados Funcionários.csv` contém informações sobre:
-- **36 funcionários** da empresa
-- **Variáveis**: ID, Estado Civil, Instrução, Filhos, Salário, Idade, Meses de Empresa, Região
-- **Período**: Dados atualizados com informações demográficas e salariais
+```bash
+pip install -r requirements.txt
+```
 
-## 📈 Principais Descobertas
+### 3. Executar o pipeline
 
-###  Educação e Salário
-- Funcionários com ensino superior apresentam salários significativamente maiores
-- Existe uma correlação positiva clara entre nível de instrução e remuneração
+```bash
+python main.py
+```
 
-###  Perfil Demográfico
-- **Estado Civil**: 55.6% casados, 44.4% solteiros
-- **Idade**: Distribuição entre 20-48 anos, com média equilibrada
-- **Família**: Todos os solteiros não possuem filhos
+Por padrão, a execução utiliza o trimestre `20241`, correspondente ao primeiro trimestre de 2024.
 
-###  Fatores Salariais
-- **Idade**: Correlação positiva moderada com salário
-- **Estado Civil**: Diferenças salariais entre grupos
-- **Experiência**: Meses de empresa influenciam remuneração
+Para consultar outro período, altere o argumento da função `estabelecimentos_credenciados()` em `main.py`.
 
-##  Metodologia
+O programa consulta a API e grava os dados em arquivos CSV e SQLite dentro de `src/datasets/`.
 
-1. **Exploração dos Dados** - Análise inicial e limpeza
-2. **Visualização** - Gráficos estatísticos com matplotlib/seaborn
-3. **Análise Estatística** - Correlações, médias e distribuições
-4. **Interpretação** - Insights baseados nos dados
-5. **Documentação** - Respostas detalhadas para cada pergunta
+**Observação:** a exportação para MySQL está disponível no código, mas desabilitada por padrão. Sua utilização exige um banco configurado e credenciais válidas.
 
-## 📚 Bibliotecas Principais
+## Análise e visualização
 
-- **Pandas**: Manipulação e análise de dados
-- **Matplotlib**: Criação de gráficos básicos
-- **Seaborn**: Visualizações estatísticas avançadas
-- **SciPy**: Testes estatísticos (ANOVA)
+Além do pipeline, o projeto inclui dois materiais complementares:
 
-## 🎨 Tipos de Gráficos Utilizados
+**Jupyter Notebook**
 
-- **Histogramas** - Distribuição de variáveis contínuas
-- **Boxplots** - Comparação entre grupos
-- **Scatterplots** - Relações entre variáveis
-- **Gráficos de Pizza** - Proporções e frequências
-- **Gráficos de Barras** - Contagens e comparações
+Arquivo `relatorio_estabelecimentos.ipynb`, destinado à exploração e análise dos dados.
 
-## 📝 Conclusões
+**Power BI**
 
-A análise revela uma empresa com:
-- Força de trabalho diversificada em termos de idade e instrução
-- Política salarial que valoriza educação e experiência
-- Perfil demográfico equilibrado entre solteiros e casados
-- Correlações significativas entre variáveis demográficas e salariais
+Arquivo `Relatorio Estabelecimentos Credenciados.pbix`, contendo o relatório de visualização do projeto.
 
-## 🤝 Contribuições
+Esses materiais complementam o processo de coleta e armazenamento, permitindo explorar os dados em diferentes ferramentas.
 
-Contribuições são bem-vindas! Para contribuir:
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Abra um Pull Request
+## Aprendizados
 
-## 📄 Licença
+O desenvolvimento deste projeto proporcionou experiência prática em:
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+- Integração com APIs REST e consumo de dados públicos.
+- Tratamento de respostas JSON com pandas.
+- Construção de pipelines ETL em Python.
+- Persistência e organização de dados em SQLite.
+- Integração com bancos relacionais utilizando SQLAlchemy.
+- Separação de responsabilidades em módulos Python.
+- Exploração e apresentação de dados utilizando Jupyter e Power BI.
 
-## 👨‍💻 Autor
+## Limitações e melhorias futuras
 
-**Seu Nome**
-- GitHub: [Biieru](https://github.com/Biieru)
-- LinkedIn: [Gabriel C Araujo](https://linkedin.com/in/GabrielCAraujo)
-- Em qualquer outra rede: @Bordercansado
+A implementação atual utiliza um trimestre fixo e executa a extração sob demanda.
 
-⭐ **Se este projeto foi útil, considere dar uma estrela no GitHub!**
+Possíveis evoluções incluem:
+
+- Parametrização do trimestre por linha de comando.
+- Coleta automatizada de múltiplos períodos.
+- Tratamento de erros HTTP e indisponibilidade da API.
+- Validação de dados e testes automatizados.
+- Padronização das configurações de conexão.
+- Documentação visual dos indicadores produzidos no Power BI.
+
+## Autores
+
+Projeto acadêmico desenvolvido por:
+
+- **Gabriel Coelho de Araújo** | [GitHub](https://github.com/Biieru)
+- **Cauan Warlley**
+
+## Fonte e licença
+
+Os dados utilizados são disponibilizados publicamente pelo Banco Central do Brasil.
+
+Este repositório contém um arquivo `LICENSE` com os termos de licenciamento do projeto.
+
+---
+
+**Python · ETL · SQL · Análise de Dados · Power BI**
